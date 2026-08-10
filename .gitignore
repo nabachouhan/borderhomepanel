@@ -1,0 +1,10 @@
+node_modules
+.env
+shpuploads
+downloads
+uploads
+sonar-project.properties
+.scannerwork
+catalog
+raster_catalog
+tempuploads

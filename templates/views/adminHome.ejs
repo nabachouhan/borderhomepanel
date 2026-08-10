@@ -1,0 +1,112 @@
+<%- include('../partials/adminhead') %>
+
+  <body>
+    <!-- admin-Sidebar -->
+    <div class="admin-sidebar" id="admin-sidebar">
+      <h4 class="text-white mb-4">Border Monitoring</h4>
+       <div class="mb-4">
+      <i class="bi bi-person-circle me-2"></i><%= full_name %>
+    </div>
+      <a href="/admin/home" class="active"><i class="bi bi-grid"></i> Home</a>
+     
+      <a href="/admin/upload"><i class="bi bi-gem"></i> Upload</a>
+      <a href="/admin/publish"><i class="bi bi-gem"></i> Publish</a>
+      <a href="/admin/manage"><i class="bi bi-person"></i> Manage</a>
+      <a href="" id="adminLogout"><i class="bi bi-journal-text"></i> Logout</a>
+      
+
+    </div>
+
+    <!-- Main Content -->
+    <div class="content" id="mainContent">
+      <div class="themed-box topbar d-flex flex-wrap justify-content-between align-items-center gap-2 themed-box">
+        <div class="d-flex align-items-center gap-3">
+        <i class="bi bi-list fs-3 cursor-pointer"  id="toggleSidebarBtn" style="cursor: pointer;"></i>
+          <h4 class="mb-0">Dashboard</h4>
+        </div>
+        <div class="d-flex align-items-center gap-2">
+
+          <i class="bi bi-bell me-2"></i>
+          <i class="bi bi-gear"></i>
+        </div>
+      </div>
+
+      <main class="main">
+  <div class="container">
+    <div class="row mt-4 g-4">
+
+      <!-- 1️⃣ Total Users -->
+      <div class="col-lg-4 col-md-6">
+        <div class="card shadow-sm h-100">
+          <div class="card-body text-center themed-box rounded">
+            <h6 class="text-muted">Total Administrative Layers</h6>
+            <h2 class="fw-bold"><%= userItems.administrativecount %></h2>
+          </div>
+        </div>
+      </div>
+
+      <!-- 2️⃣ Total Requests -->
+      <div class="col-lg-4 col-md-6">
+        <div class="card shadow-sm h-100">
+          <div class="card-body text-center themed-box rounded">
+            <h6 class="text-muted">Total Raster Layers</h6>
+            <h2 class="fw-bold"><%= userItems.rastercount %></h2>
+          </div>
+        </div>
+      </div>
+
+      <!-- 3️⃣ Pending Requests -->
+      <div class="col-lg-4 col-md-6">
+        <div class="card shadow-sm h-100">
+          <div class="card-body text-center themed-box rounded">
+            <h6 class="text-muted">Total LULC Layers</h6>
+            <h2 class="fw-bold"><%= userItems.lulccount %></h2>
+          </div>
+        </div>
+      </div>
+
+      <!-- 4️⃣ Total Queries -->
+      <div class="col-lg-4 col-md-6">
+        <div class="card shadow-sm h-100">
+          <div class="card-body text-center themed-box rounded">
+            <h6 class="text-muted">Total Hotspot Layers</h6>
+            <h2 class="fw-bold"><%= userItems.hotspotcount %></h2>
+          </div>
+        </div>
+      </div>
+
+      <!-- 5️⃣ Total Datasets -->
+      <div class="col-lg-4 col-md-6">
+        <div class="card shadow-sm h-100">
+          <div class="card-body text-center themed-box rounded">
+            <h6 class="text-muted">Total AOI</h6>
+            <h2 class="fw-bold"><%= userItems.aoicount %></h2>
+          </div>
+        </div>
+      </div>
+
+      <!-- 6️⃣ Administrative Layers -->
+      <div class="col-lg-4 col-md-6">
+        <div class="card shadow-sm h-100">
+          <div class="card-body text-center themed-box rounded">
+            <h6 class="text-muted">Total LULC Change Layers</h6>
+            <h2 class="fw-bold"><%= userItems.lulcchange %></h2>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</main>
+
+
+
+    </div>
+
+  <script src="/admin-assets/js/handlesubmits.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+
+  </body>
+
+  </html>

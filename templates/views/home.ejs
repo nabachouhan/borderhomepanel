@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Assam–Nagaland Border Monitoring System</title>
+
+  <!-- Fonts & Icons -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="/css/home.css">
+</head>
+
+<body>
+  <!-- Header -->
+  <header id="main-header" class="header">
+    <nav class="navbar navbar-expand-lg">
+      <div class="container">
+        <a class="navbar-brand" href="#">
+          <div class="assam-gov-brand">
+            <!-- ASSAC Logo (Primary) -->
+            <img src="/image/assac-logo.png" alt="ASSAC Logo" class="assac-logo">
+
+            <div class="brand-text">
+              <span class="assac-title">Assam State Space Application Centre</span>
+              <span class="portal-title">Assam–Nagaland Border Monitoring Portal</span>
+            </div>
+          </div>
+        </a>
+
+
+
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+          <i class="fas fa-bars"></i>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navbarNav">
+          <ul class="navbar-nav ms-auto align-items-center">
+            <li class="nav-item">
+              <a class="nav-link" href="#">Home</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="#datasets">Datasets</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="#features">Monitoring Tools</a>
+            </li>
+            <li class="nav-item ms-3">
+              <a href="/admin/home" class="btn-login">
+                <i class="fas fa-user-shield"></i> Admin
+              </a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+  </header>
+
+  <!-- Hero Section -->
+  <section class="hero">
+    <div class="hero-overlay"></div>
+    <div class="container">
+      <div class="row justify-content-center">
+        <div class="col-lg-10 col-xl-8">
+          <div class="hero-content text-center">
+            <h1>Assam–Nagaland Border Monitoring Portal</h1>
+            <p class="lead">
+              A geospatial monitoring system for continuous observation of the
+              Assam–Nagaland interstate border using multi-year LULC data, satellite imagery,
+              change detection, and analytical reporting tools.
+            </p>
+            <div class="hero-buttons">
+              <a href="/dashboard" class="btn btn-primary">
+                <i class="fas fa-map"></i> Open Dashboard
+              </a>
+              <a href="#" class="btn btn-outline" data-bs-toggle="modal" data-bs-target="#aboutProjectModal">
+                <i class="fas fa-info-circle"></i> About Project
+              </a>
+
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- About Project Modal -->
+<!-- About Project Modal -->
+<div class="modal fade" id="aboutProjectModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+    <div class="modal-content about-modal">
+
+      <div class="modal-header">
+        <h5 class="modal-title">
+          Development of Comprehensive Change & Encroachment Detection System
+          using Geospatial Technology for Assam–Nagaland Interstate Border
+        </h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+
+      <div class="modal-body">
+
+        <p class="modal-intro">
+          The project <strong>“Development of Comprehensive Change & Encroachment Detection System using Geospatial Technology for Assam–Nagaland Interstate Border”</strong> 
+          focuses on scientific monitoring of land use and land cover changes along the interstate boundary using satellite and UAV-based geospatial technologies. 
+          The system supports evidence-based border monitoring, change assessment, and decision support.
+        </p>
+
+        <h6>Background</h6>
+        <p>
+          The Assam–Nagaland interstate boundary extends approximately 512 km and includes multiple historically disputed sectors. 
+          Recurring border disputes and encroachment concerns require a systematic, technology-driven monitoring framework using 
+          multi-temporal satellite imagery, GIS analysis, and spatial databases.
+        </p>
+
+        <h6>Project Objectives</h6>
+        <ul class="modal-list">
+          <li>Map Land Use Land Cover (LULC) along the Assam–Nagaland border using a 2 km buffer on both sides</li>
+          <li>Establish base-year LULC mapping from 1989 onward</li>
+          <li>Perform temporal change detection at quarterly monitoring intervals</li>
+          <li>Detect land transformation such as forest to settlement, agriculture, and other land uses</li>
+          <li>Support encroachment and hotspot identification using high-resolution imagery</li>
+        </ul>
+
+        <h6>Data & Methodology</h6>
+        <ul class="modal-list">
+          <li>Use multi-source satellite data including IRS, Landsat, Sentinel-2, and ultra high-resolution imagery</li>
+          <li>Minimum mapping unit of 25 sq.m for classification</li>
+          <li>Image preprocessing including rectification, reprojection, and enhancement</li>
+          <li>GIS-based overlay and temporal change detection analysis</li>
+          <li>Optional UAV surveys for hotspot and disputed locations</li>
+          <li>Use of ArcGIS, QGIS, and ERDAS Imagine for geospatial processing</li>
+        </ul>
+
+        <h6>System Components</h6>
+        <ul class="modal-list">
+          <li>Multi-year LULC mapping and change detection layers</li>
+          <li>Geospatial database with temporal attributes</li>
+          <li>Encroachment and built-up change assessment</li>
+          <li>Interactive Web-GIS application for visualization and analysis</li>
+        </ul>
+
+        <h6>Deliverables</h6>
+        <ul class="modal-list">
+          <li>Base year (1989) and quarterly LULC change maps</li>
+          <li>Integrated GIS database with metadata</li>
+          <li>Web-GIS monitoring platform with query and analysis tools</li>
+          <li>Analytical outputs, statistics, and monitoring reports</li>
+        </ul>
+
+        <h6>Implementation</h6>
+        <p>
+          The project is implemented as a geospatial technology initiative in support of interstate border monitoring, 
+          using satellite data, GIS analysis, and web-based visualization systems for operational decision support.
+        </p>
+
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+
+  <!-- Data Counts Section -->
+  <section class="data-counts" id="datasets">
+    <div class="container">
+      <div class="section-header">
+        <h2>Monitoring Coverage</h2>
+        <p class="section-subtitle">Temporal datasets and analytical outputs for border surveillance</p>
+      </div>
+
+      <div class="row">
+        <div class="col-lg-3 col-md-6 mb-4">
+          <div class="count-card">
+            <div class="count-icon">
+              <i class="fas fa-database"></i>
+            </div>
+            <h3><%= userItems.rastercount %></h3>
+            <p>Raster Datasets</p>
+          </div>
+        </div>
+
+        <div class="col-lg-3 col-md-6 mb-4">
+          <div class="count-card">
+            <div class="count-icon">
+              <i class="fas fa-calendar-alt"></i>
+            </div>
+            <h3><%= userItems.lulccount %></h3>
+            <p>LULC Layers</p>
+          </div>
+        </div>
+
+        <div class="col-lg-3 col-md-6 mb-4">
+          <div class="count-card">
+            <div class="count-icon">
+              <i class="fas fa-chart-line"></i>
+            </div>
+            <h3><%= userItems.lulcchange %></h3>
+            <p>LULC Change Layers</p>
+          </div>
+        </div>
+
+        <div class="col-lg-3 col-md-6 mb-4">
+          <div class="count-card">
+            <div class="count-icon">
+              <i class="fas fa-eye"></i>
+            </div>
+            <h3><%= userItems.hotspotcount %></h3>
+            <p>Hotspot Layers</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Features Section -->
+  <section id="features" class="features">
+    <div class="container">
+      <div class="section-header">
+        <h2>Monitoring Capabilities</h2>
+        <p class="section-subtitle">Tools for continuous border observation and analysis</p>
+      </div>
+
+      <div class="row">
+        <div class="col-lg-3 col-md-6 mb-4">
+          <div class="feature-card">
+            <div class="feature-icon">
+              <i class="fas fa-eye"></i>
+            </div>
+            <h4>Border Surveillance</h4>
+            <p>Continuous geospatial monitoring of the Assam–Nagaland border using time-series satellite
+              data.</p>
+          </div>
+        </div>
+
+        <div class="col-lg-3 col-md-6 mb-4">
+          <div class="feature-card">
+            <div class="feature-icon">
+              <i class="fas fa-layer-group"></i>
+            </div>
+            <h4>Year-wise LULC Monitoring</h4>
+            <p>Assessment of land use and land cover dynamics and land cover change patterns.</p>
+          </div>
+        </div>
+
+        <div class="col-lg-3 col-md-6 mb-4">
+          <div class="feature-card">
+            <div class="feature-icon">
+              <i class="fas fa-exchange-alt"></i>
+            </div>
+            <h4>Raster Comparison & Swipe</h4>
+            <p>Swipe and comparison tools for visual inspection of multi-temporal satellite imagery.</p>
+          </div>
+        </div>
+
+        <div class="col-lg-3 col-md-6 mb-4">
+          <div class="feature-card">
+            <div class="feature-icon">
+              <i class="fas fa-chart-bar"></i>
+            </div>
+            <h4>Analytics & Reports</h4>
+            <p>Report charts, area statistics, distance measurements, and downloadable monitoring
+              reports.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <!-- Footer -->
+  <footer id="about" class="footer">
+    <div class="container">
+      <div class="row footer-main">
+        <!-- Quick Links -->
+        <div class="col-lg-6 col-md-6 footer-boxes">
+          <h5 class="footer-title">Quick Links</h5>
+          <ul class="footer-links">
+            <li>
+              <a href="https://assac.assam.gov.in" target="_blank">
+                <i class="fas fa-up-right-from-square"></i> Assam State Space Application Centre
+              </a>
+            </li>
+            <li>
+              <a href="https://bpdd.assam.gov.in" target="_blank">
+                <i class="fas fa-up-right-from-square"></i> Border Protection & Development
+              </a>
+            </li>
+            <li>
+              <a href="https://bhuvan.nrsc.gov.in" target="_blank">
+                <i class="fas fa-up-right-from-square"></i> Bhuvan
+              </a>
+            </li>
+          </ul>
+        </div>
+
+
+        <!-- Contact -->
+        <div class="col-lg-6 col-md-6 footer-boxes">
+          <h5 class="footer-title">Contact</h5>
+          <div class="footer-contact">
+            <p><i class="fas fa-map-marker-alt"></i> Bigyan Bhawan, G.S. Road, Guwahati-781005</p>
+            <p><i class="fas fa-phone"></i> +91-9411768991</p>
+            <p><i class="fas fa-envelope"></i> dirassac2021@gmail.com</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="footer-bottom">
+        <p>© 2026 Assam State Space Application Centre · All rights reserved</p>
+      </div>
+    </div>
+  </footer>
+
+
+  <!-- JavaScript -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="js/home.js"></script>
+</body>
+
+</html>

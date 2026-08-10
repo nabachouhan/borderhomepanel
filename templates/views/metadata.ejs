@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Assam GIS Explorer</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.4.1/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/jspdf@3.0.1/dist/jspdf.es.min.js"></script>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/ol@v9.2.4/ol.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.10.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/css/metadata.css">
+
+</head>
+<body>
+<nav class="navbar navbar-expand-lg d-flex align-items-center justify-content-between p-2 pr-6"
+     data-wow-delay="0.1s">
+
+    <div class="d-flex align-items-center gap-2">
+
+       
+        <!-- Logo -->
+        <a href="index.html" class="navbar-brand d-flex align-items-center">
+            <img src="/image/assac-logo.png" alt="ASSAC Logo" width="60" height="60"
+                 class="d-inline-block align-top">
+        </a>
+
+        <!-- Title -->
+        <div class="text-white lh-sm">
+            <h6 class="mb-0">Assam State Space Application Centre</h6>
+            <small class="text-secondary">Border Monitoring Portal</small>
+        </div>
+
+    </div>
+
+</nav>
+
+    <% catalogItems.forEach(function(item){ %>
+    <div class="metadata-container mt-3 mb-3">
+        <div class="header-section">
+            <div>
+                <div class="header-title">Data and Resources</div>
+                <div class="file-info"><%= item.title %> <span class="category"></span></div>
+            </div>
+            <div class="">
+
+            </div>
+        </div>
+
+        <!-- Tab Navigation -->
+        <ul class="nav nav-tabs" id="metadataTabs" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="identification-tab" data-bs-toggle="tab" data-bs-target="#identification" type="button" role="tab">Identification</button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="contact-tab" data-bs-toggle="tab" data-bs-target="#contact" type="button" role="tab">Contact Information</button>
+            </li>    
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="quality-tab" data-bs-toggle="tab" data-bs-target="#quality" type="button" role="tab">Data Quality</button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="date-tab" data-bs-toggle="tab" data-bs-target="#date" type="button" role="tab">Charset & Language</button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="metadata-info-tab" data-bs-toggle="tab" data-bs-target="#metadata-info" type="button" role="tab">Metadata Info</button>
+            </li>
+        </ul>
+
+        <!-- Tab Content -->
+        <div class="tab-content" id="metadataTabContent">
+    <!-- Identification -->
+    <div class="tab-pane fade show active" id="identification" role="tabpanel">
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th>Field</th>
+                    <th>Value</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <th>Spatial / Geographical Coverage Area(Upper Left, Upper Right, Lower Left, Lower Right)</th>
+                    <td><span class="metadata-value"><%= item.spatial_coverage %></span></td>
+                    <td><button class="copy-btn" data-copy-text="<%= item.spatial_coverage %>">Copy</button></td>
+                </tr>
+                <tr>
+                    <th>Dataset Thumbnail</th>
+                    <td><img id="mapImg" alt="Map image" width="200" src="/catalog/getthumbnail/<%= item.theme %>/<%= item.file_name %>"></td>
+                    <td><button class="copy-btn" data-copy-text="">Copy</button></td>
+                </tr>
+                <tr>
+                    <th>Group content visibility</th>
+                    <td><span class="metadata-value"><%= item.group_visibility %></span></td>
+                    <td><button class="copy-btn" data-copy-text="<%= item.group_visibility %>">Copy</button></td>
+                </tr>
+                <tr>
+                    <th>Publisher</th>
+                    <td><span class="metadata-value"><%= item.publisher %></span></td>
+                    <td><button class="copy-btn" data-copy-text="<%= item.publisher %>">Copy</button></td>
+                </tr>
+                <tr>
+                    <th>Data Type</th>
+                    <td><span class="metadata-value"><%= item.file_type %></span></td>
+                    <td><button class="copy-btn" data-copy-text="<%= item.file_type %>">Copy</button></td>
+                </tr>
+                <tr>
+                    <th>Scale</th>
+                    <td><span class="metadata-value"><%= item.scale %></span></td>
+                    <td><button class="copy-btn" data-copy-text="<%= item.scale %>">Copy</button></td>
+                </tr>
+                <tr>
+                    <th>Projection Information</th>
+                    <td><span class="metadata-value"><%= item.projection %></span></td>
+                    <td><button class="copy-btn" data-copy-text="<%= item.projection %>">Copy</button></td>
+                </tr>
+                <tr>
+                    <th>Public Access Level</th>
+                    <td><span class="metadata-value"><%= item.public_access_level %></span></td>
+                    <td><button class="copy-btn" data-copy-text="<%= item.public_access_level %>">Copy</button></td>
+                </tr>
+                <tr>
+                    <th>Source Date</th>
+                    <td><span class="metadata-value"><%= item.source_date %></span></td>
+                    <td><button class="copy-btn" data-copy-text="<%= item.source_date %>">Copy</button></td>
+                </tr>
+                <tr>
+                    <th>Topic Category</th>
+                    <td><span class="metadata-value"><%= item.theme %></span></td>
+                    <td><button class="copy-btn" data-copy-text="<%= item.theme %>">Copy</button></td>
+                </tr>
+                <tr>
+                    <th>Citation</th>
+                    <td><span class="metadata-value"><%= item.citation %></span></td>
+                    <td><button class="copy-btn" data-copy-text="<%= item.citation %>">Copy</button></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Contact Information -->
+    <div class="tab-pane fade" id="contact" role="tabpanel">
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th>Field</th>
+                    <th>Value</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <th>Contact Person</th>
+                    <td><span class="metadata-value">Director</span></td>
+                    <td><button class="copy-btn" data-copy-text="Director">Copy</button></td>
+                </tr>
+                <tr>
+                    <th>Organisation</th>
+                    <td><span class="metadata-value">Assam State Space Application Centre</span></td>
+                    <td><button class="copy-btn" data-copy-text="Assam State Space Application Centre">Copy</button></td>
+                </tr> 
+                <tr>
+                    <th>Mailing Address</th>
+                    <td><span class="metadata-value">GS Rd, near IDBI Bank ABC, ABC, Near IDBI Bank, Sree Nagar, Guwahati, Assam 781005</span></td>
+                    <td><button class="copy-btn" data-copy-text="GS Rd, near IDBI Bank ABC, ABC, Near IDBI Bank, Sree Nagar, Guwahati, Assam 781005">Copy</button></td>
+                </tr> 
+                <tr>
+                    <th>City/Locality</th>
+                    <td><span class="metadata-value">Guwahati</span></td>
+                    <td><button class="copy-btn" data-copy-text="Guwahati">Copy</button></td>
+                </tr>  
+                <tr>
+                    <th>Country</th>
+                    <td><span class="metadata-value">India</span></td>
+                    <td><button class="copy-btn" data-copy-text="India">Copy</button></td>
+                </tr> 
+                <tr>
+                    <th>Contact Telephone</th>
+                    <td><span class="metadata-value"> 069138 48401</span></td>
+                    <td><button class="copy-btn" data-copy-text=" 069138 48401">Copy</button></td>
+                </tr>
+                <tr>
+                    <th>Email</th>
+                    <td><span class="metadata-value">dirassac2021[at]gmail[dot]com</span></td>
+                    <td><button class="copy-btn" data-copy-text="dirassac2021[at]gmail[dot]com">Copy</button></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Data Quality -->
+    <div class="tab-pane fade" id="quality" role="tabpanel">
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th>Field</th>
+                    <th>Value</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <th>Data Quality</th>
+                    <td><span class="metadata-value"><%= item.data_quality %></span></td>
+                    <td><button class="copy-btn" data-copy-text="<%= item.data_quality %>">Copy</button></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Date & Language -->
+    <div class="tab-pane fade" id="date" role="tabpanel">
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th>Field</th>
+                    <th>Value</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <th>Dataset Language</th>
+                    <td><span class="metadata-value"><%= item.language %></span></td>
+                    <td><button class="copy-btn" data-copy-text="<%= item.language %>">Copy</button></td>
+                </tr>
+                <tr>
+                    <th>Character Set</th>
+                    <td><span class="metadata-value">UTF-8</span></td>
+                    <td><button class="copy-btn" data-copy-text="UTF-8">Copy</button></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Metadata Info -->
+    <div class="tab-pane fade" id="metadata-info" role="tabpanel">
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th>Field</th>
+                    <th>Value</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <th>Metadata Date Stamp</th>
+                    <td><span class="metadata-value"><%= item.metadata_date %></span></td>
+                    <td><button class="copy-btn" data-copy-text="<%= item.metadata_date %>">Copy</button></td>
+                </tr>
+                <tr>
+                    <th>Metadata Standard Name</th>
+                    <td><span class="metadata-value">ISO 19115</span></td>
+                    <td><button class="copy-btn" data-copy-text="ISO 19115">Copy</button></td>
+                </tr>
+                <tr>
+                    <th>Metadata Standard Version</th>
+                    <td><span class="metadata-value">2014</span></td>
+                    <td><button class="copy-btn" data-copy-text="2014">Copy</button></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+    </div>
+    <% }) %>
+
+<!-- Footer Start -->
+<div class="container-fluid footer-bg text-light footer pt-5 wow fadeIn"
+  data-wow-delay="0.1s">
+  <footer id="about" class="footer">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-4">
+                    <div class="footer-brand">
+                        <i class="fas fa-eye"></i>
+                        <h4>Border Monitoring System</h4>
+                        <p>Assam–Nagaland Interstate Border<br>Assam State Space Application Centre</p>
+                    </div>
+                </div>
+
+                <div class="col-lg-4">
+                    <h5>Quick Links</h5>
+                    <ul class="footer-links">
+                        <li><a href="#">Home</a></li>
+                        <li><a href="#features">Monitoring Tools</a></li>
+                        <li><a href="#about">About System</a></li>
+                        <li><a href="/admin/home">Admin</a></li>
+                    </ul>
+                </div>
+
+                <div class="col-lg-4">
+                    <h5>Contact</h5>
+                    <div class="footer-contact">
+                        <p><i class="fas fa-map-marker-alt"></i> Bigyan Bhawan, G.S. Road, Guwahati-781005</p>
+                        <p><i class="fas fa-phone"></i> 069138 48401</p>
+                        <p><i class="fas fa-envelope"></i> dirassac2021@gmail.com</p>
+                    </div>
+                </div>
+            </div>
+
+            
+        </div>
+        <div class="footer-bottom">
+              <p>&copy; 2024 Assam–Nagaland Border Monitoring System. All rights reserved.</p>
+          </div>
+    </footer>
+
+
+    <!-- Bootstrap 5 JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/js/toogleAndHandleTheme.js"></script>
+    <script src="/js/downloadMeta.js"></script>
+    <script src="/js/backNhome.js"></script>
+
+</body>
+</html>

@@ -1,0 +1,186 @@
+<%- include('../partials/adminhead') %>
+
+<body>
+  <!-- admin-Sidebar -->
+  <div class="admin-sidebar" id="admin-sidebar">
+    <h4 class="text-white mb-4">Border Monitoring</h4>
+    <div class="mb-4">
+      <i class="bi bi-person-circle me-2"></i><%= full_name %>
+    </div>
+    <a href="/admin/home"><i class="bi bi-grid"></i> Home</a>
+    <a href="/admin/upload"><i class="bi bi-gem"></i> Upload</a>
+    <a href="/admin/publish"><i class="bi bi-gem"></i> Publish</a>
+    <a href="/admin/manage" class="active"><i class="bi bi-person"></i>
+      Manage</a>
+    <a href="" id="adminLogout"><i class="bi bi-journal-text"></i> Logout</a>
+  </div>
+
+  <!-- Main Content -->
+  <div class="content" id="mainContent">
+    <div class="themed-box topbar d-flex flex-wrap justify-content-between align-items-center gap-2 themed-box sticky-top">
+      <div class="d-flex align-items-center gap-3">
+        <i class="bi bi-list fs-3 cursor-pointer"  id="toggleSidebarBtn" style="cursor: pointer;"></i>
+        <h4 class="mb-0">Dashboard</h4>
+
+      </div>
+      <div class="d-flex align-items-center gap-2">
+        <select class="form-select form-select-sm" id="searchField" style="max-width: 150px;">
+  <option value="title" <%= searchField === 'title' ? 'selected' : '' %>>Title</option>
+  <option value="file_name" <%= searchField === 'file_name' ? 'selected' : '' %>>File Name</option>
+  <option value="file_type" <%= searchField === 'file_type' ? 'selected' : '' %>>File Type</option> <!-- ✅ -->
+  <option value="theme" <%= searchField === 'theme' ? 'selected' : '' %>>Theme</option>
+</select>
+
+        <input type="text" class="form-control form-control-sm" id="searchValue" placeholder="Search..." style="max-width: 200px;" value="<%= searchValue %>">
+        <button class="btn btn-sm btn-primary" id="applySearchBtn">Apply</button>
+        <i class="bi bi-bell me-2"></i>
+        <i class="bi bi-gear"></i>
+      </div>
+    </div>
+
+    <main class="main">
+      <div class="container-fluid p-4">
+        <div class="card border-0 rounded  themed-box">
+          <div class="card-header">
+            <h6 class="card-subtitle text-muted p-3 text-center">
+              Toggle Visibility/Meta Edit Mode Of Layers!
+            </h6>
+          </div>
+          <div class="card-body">
+            <table class="table">
+              <thead class="thead">
+                <tr>
+                  <th scope="col">
+                    <a href="#" class="sort-link" data-field="sn">ID
+                      <% if (sortField === 'sn') { %>
+                      <%= sortOrder === 'ASC' ? '↑' : '↓' %>
+                      <% } %>
+                    </a>
+                  </th>
+                  <th scope="col">
+                    <a href="#" class="sort-link" data-field="title">Title
+                      <% if (sortField === 'title') { %>
+                      <%= sortOrder === 'ASC' ? '↑' : '↓' %>
+                      <% } %>
+                    </a>
+                  </th>
+                  <th scope="col">
+                    <a href="#" class="sort-link" data-field="file_name">File Name
+                      <% if (sortField === 'file_name') { %>
+                      <%= sortOrder === 'ASC' ? '↑' : '↓' %>
+                      <% } %>
+                    </a>
+                  </th>
+                  <th scope="col">
+                    <a href="#" class="sort-link" data-field="file_type">File Type
+                      <% if (sortField === 'file_type') { %>
+                        <%= sortOrder === 'ASC' ? '↑' : '↓' %>
+                      <% } %>
+                    </a>
+                  </th>
+
+                  <th scope="col">
+                    <a href="#" class="sort-link" data-field="theme">Theme
+                      <% if (sortField === 'theme') { %>
+                      <%= sortOrder === 'ASC' ? '↑' : '↓' %>
+                      <% } %>
+                    </a>
+                  </th>
+                  <th scope="col">
+                    <a href="#" class="sort-link" data-field="visibility">visibility
+                      <% if (sortField === 'visibility') { %>
+                      <%= sortOrder === 'ASC' ? '↑' : '↓' %>
+                      <% } %>
+                    </a>
+                  </th>
+
+                  <th scope="col">
+                    <a href="#" class="sort-link" data-field="edit_mode">edit_mode
+                      <% if (sortField === 'edit_mode') { %>
+                      <%= sortOrder === 'ASC' ? '↑' : '↓' %>
+                      <% } %>
+                    </a>
+                  </th>
+
+                  <th scope="col">Delete</th>
+                </tr>
+              </thead>
+              <tbody>
+                <% catalogItems.forEach(function(item) { %>
+                <tr>
+                  <th scope="row"><%= item.sn %></th>
+                  <td><%= item.title %></td>
+                  <td><%= item.file_name %></td>
+                  <td><%= item.file_type %></td>
+
+                  <td><%= item.theme %></td>
+                  <td>
+                    <div class="form-check form-switch fs-3">
+                      <% if (item.visibility === true) { %>
+                      <input class="form-check-input btn-delist" type="checkbox" role="switch" data-id="<%= item.sn %>" checked>
+                      <% } else { %>
+                      <input class="form-check-input btn-delist" type="checkbox" role="switch" data-id="<%= item.sn %>">
+                      <% } %>
+                    </div>
+                  </td>
+                  <td>
+                    <div class="form-check form-switch fs-3">
+                      <% if (item.edit_mode === true) { %>
+                      <input class="form-check-input btn-edit" type="checkbox" data-id="<%= item.sn %>" checked>
+                      <% } else { %>
+                      <input class="form-check-input btn-edit" type="checkbox" data-id="<%= item.sn %>">
+                      <% } %>
+                    </div>
+
+                  </td>
+                  <td>
+                    <input type="button" class="btn btn-primary btn-delete" value="delete" file-name="<%= item.file_name %>" file-type="<%= item.file_type %>" file-store="<%= item.theme %>", file-theme="<%= item.theme %>">
+                  </td>
+                </tr>
+                <% }); %>
+              </tbody>
+            </table>
+            <nav aria-label="Page navigation example">
+              <ul class="pagination justify-content-center">
+                <% if (currentPage > 1) { %>
+                <li class="page-item">
+                  <a class="page-link" href="/admin/manage?page=<%= currentPage - 1 %>&sortField=<%= sortField %>&sortOrder=<%= sortOrder %>&searchField=<%= encodeURIComponent(searchField) %>&searchValue=<%= encodeURIComponent(searchValue) %>">Previous</a>
+                </li>
+                <% } else { %>
+                <li class="page-item disabled">
+                  <a class="page-link" href="#">Previous</a>
+                </li>
+                <% } %>
+
+                <% for (let i = 1; i <= totalPages; i++) { %>
+                <li class="page-item <%= currentPage === i ? 'active' : '' %>">
+                  <a class="page-link" href="/admin/manage?page=<%= i %>&sortField=<%= sortField %>&sortOrder=<%= sortOrder %>&searchField=<%= encodeURIComponent(searchField) %>&searchValue=<%= encodeURIComponent(searchValue) %>"><%=
+                    i %></a>
+                </li>
+                <% } %>
+
+                <% if (currentPage < totalPages) { %>
+                <li class="page-item">
+                  <a class="page-link" href="/admin/manage?page=<%= currentPage + 1 %>&sortField=<%= sortField %>&sortOrder=<%= sortOrder %>&searchField=<%= encodeURIComponent(searchField) %>&searchValue=<%= encodeURIComponent(searchValue) %>">Next</a>
+                </li>
+                <% } else { %>
+                <li class="page-item disabled">
+                  <a class="page-link" href="#">Next</a>
+                </li>
+                <% } %>
+              </ul>
+            </nav>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+  <div id="searchData"
+     data-sort-field="<%= sortField %>"
+     data-sort-order="<%= sortOrder %>"></div>
+
+
+  <script src="/admin-assets/js/handlesubmits.js"></script>
+
+  <script src="/admin-assets/js/adminCatalogManage.js"></script>
+  <%- include('../partials/footer') %>

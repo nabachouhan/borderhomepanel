@@ -1,0 +1,103 @@
+<%- include('../partials/adminhead') %>
+
+<%- include('../partials/loader') %>
+
+<body class="bg-dark" data-bs-theme="dark">
+
+  <div class="container-fluid min-vh-100 d-flex justify-content-center align-items-center bg-dark">
+
+  <div class="card shadow-lg border-0 rounded-4 p-4 w-100 text-light"
+       style="max-width: 500px; background-color: #1f2933;">
+
+    <!-- Header -->
+    <div class="d-flex align-items-center mb-4">
+      <button
+        type="button"
+        id="backBtn"
+        class="btn btn-outline-light btn-sm me-3 rounded-circle"
+        title="Go Back"
+      >
+        ←
+      </button>
+
+      <div>
+        <h4 class="fw-bold mb-0 text-success">ADMIN LOGIN</h4>
+        <small class="text-muted">Assam – Nagaland Border Monitoring Portal</small>
+      </div>
+    </div>
+
+    <!-- Form -->
+    <form id="adminLoginForm" action="/admin" method="post">
+
+      <div class="mb-3">
+        <label class="form-label fw-semibold">Username</label>
+        <input
+          type="text"
+          class="form-control form-control-lg bg-dark text-light border-secondary"
+          name="email"
+          placeholder="Enter username"
+          required
+        >
+      </div>
+
+      <div class="mb-3">
+        <label class="form-label fw-semibold">Password</label>
+        <input
+          type="password"
+          class="form-control form-control-lg bg-dark text-light border-secondary"
+          name="password"
+          placeholder="Enter password"
+          required
+        >
+      </div>
+
+      <div class="mb-3">
+        <label class="form-label fw-semibold">OTP</label>
+        <input
+          type="text"
+          class="form-control form-control-lg bg-dark text-light border-secondary"
+          name="otp"
+          placeholder="Enter OTP"
+          >
+        </div>
+        
+        <!-- Cloudflare Turnstile -->
+        <div class="mt-4 d-flex justify-content-center">
+          <div class="cf-turnstile" data-sitekey="0x4AAAAAABhe4h4NsCnhXnMk"></div>
+        </div>
+      <!-- Buttons in same row -->
+      <div class="row g-2 mt-3">
+        <div class="col-6">
+          <button
+            type="submit"
+            name="submit"
+            value="GetOTP"
+            class="btn btn-outline-success w-100 rounded-3"
+          >
+            Get OTP
+          </button>
+        </div>
+
+        <div class="col-6">
+          <button
+            type="submit"
+            name="submit"
+            value="login"
+            class="btn btn-success w-100 rounded-3"
+          >
+            Login
+          </button>
+        </div>
+      </div>
+
+
+    </form>
+  </div>
+</div>
+
+  <script src="/js/script.js"></script>
+
+  <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+
+
+  <%- include('../partials/footer') %>
