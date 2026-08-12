@@ -6,6 +6,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const fileIdInput = document.getElementById("spatial_coverage");
   const themeselect = document.getElementById("meta-theme");
   const filetypeselect = document.getElementById("meta-filetype");
+  const metaCategorySelect = document.getElementById("meta_category_id");
 
 
   const title = document.getElementById("title");
@@ -39,6 +40,9 @@ document.addEventListener("DOMContentLoaded", () => {
           fileIdInput.value = data.bbox;
           themeselect.value = data.theme;
           filetypeselect.value = data.file_type;
+          if (metaCategorySelect) {
+            metaCategorySelect.value = data.category_id || "";
+          }
 
           title.value = data.title;
           publisher.value = data.publisher;
@@ -105,21 +109,26 @@ prevButtons.forEach(button => {
 // Thumbnail preview
 const thumbnailInput = document.getElementById('thumbnail');
 const thumbnailPreview = document.getElementById('thumbnailPreview');
-thumbnailInput.addEventListener('change', (e) => {
-  const file = e.target.files[0];
-  if (file) {
-    thumbnailPreview.src = URL.createObjectURL(file);
-    thumbnailPreview.style.display = 'block';
-  } else {
-    thumbnailPreview.style.display = 'none';
-  }
-});
+if (thumbnailInput && thumbnailPreview) {
+  thumbnailInput.addEventListener('change', (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      thumbnailPreview.src = URL.createObjectURL(file);
+      thumbnailPreview.style.display = 'block';
+    } else {
+      thumbnailPreview.style.display = 'none';
+    }
+  });
+}
 
 // Submit handler
-document.querySelector('.submit-btn').addEventListener('click', () => {
-  alert('Form submitted successfully!');
-  // Add actual form submission logic here
-});
+const submitBtn = document.querySelector('.submit-btn');
+if (submitBtn) {
+  submitBtn.addEventListener('click', () => {
+    alert('Form submitted successfully!');
+    // Add actual form submission logic here
+  });
+}
 
 // ---------------------
 

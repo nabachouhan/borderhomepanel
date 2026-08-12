@@ -786,6 +786,7 @@ router.get("/catalog/:file_name", async (req, res) => {
         district: district,
         tag: tag,
         department: department,
+        category_id: result.rows[0].category_id
       });
     } else {
       res.status(404).send("File not found");
@@ -822,12 +823,15 @@ router.post("/metadata", adminAuthMiddleware, upload.none(), async (req, res) =>
     language,
     projection,
     scale,
+    meta_category_id,
   } = req.body;
 
   try {
     const client = await poolUser.connect();
     // const result = await uclient.query()
     // const theme = result.rows[0].theme
+
+    const categoryIdParsed = meta_category_id ? parseInt(meta_category_id, 10) : null;
 
     await client.query(
       `
@@ -847,8 +851,9 @@ router.post("/metadata", adminAuthMiddleware, upload.none(), async (req, res) =>
           language = $13,
           projection = $14,
           scale = $15,
-          edit_mode = $16
-        WHERE file_name = $17
+          edit_mode = $16,
+          category_id = $17
+        WHERE file_name = $18
       `,
       [
         title,
@@ -867,6 +872,7 @@ router.post("/metadata", adminAuthMiddleware, upload.none(), async (req, res) =>
         projection,
         scale,
         false,
+        categoryIdParsed,
         meta_file_name
       ]
     );
@@ -1509,10 +1515,22 @@ router.get("/manage", adminAuthMiddleware, async (req, res) => {
       : "sn";
     const safeSortOrder = sortOrder.toUpperCase() === "DESC" ? "DESC" : "ASC";
 
-    // Build query
-    let query =
-      "SELECT sn, file_name, file_type, title, theme, visibility, edit_mode FROM catalog";
-    let countQuery = "SELECT COUNT(*) FROM catalog";
+    // Build query using recursive CTE to resolve category hierarchy paths
+    let query = `
+      WITH RECURSIVE category_path AS (
+        SELECT id, name, parent_id, CAST(name AS VARCHAR(1000)) AS path
+        FROM categories
+        WHERE parent_id IS NULL
+        UNION ALL
+        SELECT c.id, c.name, c.parent_id, CAST(cp.path || ' > ' || c.name AS VARCHAR(1000))
+        FROM categories c
+        INNER JOIN category_path cp ON c.parent_id = cp.id
+      )
+      SELECT c.sn, c.file_name, c.file_type, c.title, c.theme, c.visibility, c.edit_mode, cp.path AS category_path 
+      FROM catalog c
+      LEFT JOIN category_path cp ON c.category_id = cp.id
+    `;
+    let countQuery = "SELECT COUNT(*) FROM catalog c";
     let queryParams = [];
     let countParams = [];
 
@@ -1522,13 +1540,13 @@ router.get("/manage", adminAuthMiddleware, async (req, res) => {
       if (validSearchFields.includes(searchField)) {
         queryParams.push(`%${searchValue}%`);
         countParams.push(`%${searchValue}%`);
-        query += ` WHERE ${searchField} ILIKE $${queryParams.length}`;
-        countQuery += ` WHERE ${searchField} ILIKE $${countParams.length}`;
+        query += ` WHERE c.${searchField} ILIKE $${queryParams.length}`;
+        countQuery += ` WHERE c.${searchField} ILIKE $${countParams.length}`;
       }
     }
 
     // Add sorting
-    query += ` ORDER BY ${safeSortField} ${safeSortOrder}`;
+    query += ` ORDER BY c.${safeSortField} ${safeSortOrder}`;
 
     // Add pagination
     queryParams.push(limit, offset);
@@ -1646,6 +1664,113 @@ router.post("/logout", adminAuthMiddleware, (req, res) => {
     const data = { message: "Logout failed", title: "Error", icon: "error" };
 
     return res.status(500).json(data);
+  }
+});
+
+// ✅ Route: GET /categories to fetch all categories (Dashboard, protected by adminAuth)
+router.get("/categories", adminAuthMiddleware, async (req, res) => {
+  try {
+    const client = await poolUser.connect();
+    const { rows } = await client.query("SELECT * FROM categories ORDER BY name ASC");
+    client.release();
+    return res.json({ categories: rows });
+  } catch (error) {
+    console.error("Error fetching categories:", error);
+    return res.status(500).json({ error: "Failed to fetch categories" });
+  }
+});
+
+// ✅ Route: POST /categories to create a category (Dashboard, protected by adminAuth)
+router.post("/categories", adminAuthMiddleware, async (req, res) => {
+  const { name, parent_id, type } = req.body;
+  if (!name) {
+    return res.status(400).json({ error: "Category name is required" });
+  }
+  const parsedParentId = parent_id ? parseInt(parent_id, 10) : null;
+  const categoryType = type || "theme";
+
+  try {
+    const client = await poolUser.connect();
+    const { rows } = await client.query(
+      "INSERT INTO categories (name, parent_id, type) VALUES ($1, $2, $3) RETURNING *",
+      [name, parsedParentId, categoryType]
+    );
+    client.release();
+    return res.json({ success: true, category: rows[0] });
+  } catch (error) {
+    console.error("Error creating category:", error);
+    return res.status(500).json({ error: "Failed to create category" });
+  }
+});
+
+// ✅ Route: PUT /categories/:id to update/move a category (Dashboard, protected by adminAuth)
+router.put("/categories/:id", adminAuthMiddleware, async (req, res) => {
+  const { id } = req.params;
+  const { name, parent_id, type } = req.body;
+  if (!name) {
+    return res.status(400).json({ error: "Category name is required" });
+  }
+
+  const catId = parseInt(id, 10);
+  const parsedParentId = parent_id ? parseInt(parent_id, 10) : null;
+  const categoryType = type || "theme";
+
+  if (catId === parsedParentId) {
+    return res.status(400).json({ error: "A category cannot be its own parent" });
+  }
+
+  try {
+    const client = await poolUser.connect();
+
+    // Prevent cycles: Check if the new parent is a descendant of this category
+    if (parsedParentId) {
+      const { rows: descendants } = await client.query(`
+        WITH RECURSIVE category_tree AS (
+          SELECT id, parent_id FROM categories WHERE id = $1
+          UNION ALL
+          SELECT c.id, c.parent_id FROM categories c
+          INNER JOIN category_tree ct ON c.parent_id = ct.id
+        )
+        SELECT id FROM category_tree;
+      `, [catId]);
+
+      const descendantIds = descendants.map(d => d.id);
+      if (descendantIds.includes(parsedParentId)) {
+        client.release();
+        return res.status(400).json({ error: "A category cannot be moved under one of its own subcategories (would cause a circular reference)" });
+      }
+    }
+
+    const { rows } = await client.query(
+      "UPDATE categories SET name = $1, parent_id = $2, type = $3 WHERE id = $4 RETURNING *",
+      [name, parsedParentId, categoryType, catId]
+    );
+    client.release();
+
+    if (rows.length === 0) {
+      return res.status(404).json({ error: "Category not found" });
+    }
+    return res.json({ success: true, category: rows[0] });
+  } catch (error) {
+    console.error("Error updating category:", error);
+    return res.status(500).json({ error: "Failed to update category" });
+  }
+});
+
+// ✅ Route: DELETE /categories/:id to delete a category (Dashboard, protected by adminAuth)
+router.delete("/categories/:id", adminAuthMiddleware, async (req, res) => {
+  const { id } = req.params;
+  try {
+    const client = await poolUser.connect();
+    const { rowCount } = await client.query("DELETE FROM categories WHERE id = $1", [parseInt(id, 10)]);
+    client.release();
+    if (rowCount === 0) {
+      return res.status(404).json({ error: "Category not found" });
+    }
+    return res.json({ success: true });
+  } catch (error) {
+    console.error("Error deleting category:", error);
+    return res.status(500).json({ error: "Failed to delete category" });
   }
 });
 

@@ -215,10 +215,13 @@ document.addEventListener('DOMContentLoaded', () => {
   const vectorOption = document.getElementById('vectorOption');
   const rasterOption = document.getElementById('rasterOption');
   const metadataOption = document.getElementById('metadataOption');
+  const categoriesOption = document.getElementById('categoriesOption');
 
   const vectorForm = document.getElementById('vectorUploadForm');
   const rasterForm = document.getElementById('rasterUploadForm');
   const metadataForm = document.getElementById('metadataForm');
+  const categoriesForm = document.getElementById('categoriesForm');
+
   const filenameInput = document.getElementById('filename');
   const thumbnailInput = document.getElementById('thumbnail');
   const thumbnailPreview = document.getElementById('thumbnailPreview');
@@ -234,6 +237,7 @@ document.addEventListener('DOMContentLoaded', () => {
     vectorForm.classList.add('form-hidden');
     rasterForm.classList.add('form-hidden');
     metadataForm.classList.add('form-hidden');
+    if (categoriesForm) categoriesForm.classList.add('form-hidden');
 
     // Show based on selection
     if (vectorOption.checked) {
@@ -247,6 +251,11 @@ document.addEventListener('DOMContentLoaded', () => {
     if (metadataOption.checked) {
       metadataForm.classList.remove('form-hidden');
       updateStep();
+    }
+
+    if (categoriesOption && categoriesOption.checked) {
+      if (categoriesForm) categoriesForm.classList.remove('form-hidden');
+      loadCategories();
     }
   }
 
@@ -470,20 +479,27 @@ document.addEventListener('DOMContentLoaded', () => {
   vectorOption.addEventListener('change', toggleForms);
   rasterOption.addEventListener('change', toggleForms);
   metadataOption.addEventListener('change', toggleForms);
+  if (categoriesOption) {
+    categoriesOption.addEventListener('change', toggleForms);
+  }
 
 
   // Filename validation
-  filenameInput.addEventListener('input', () => {
-    const pattern = /^[a-z0-9_]+$/;
-    filenameInput.classList.toggle('is-invalid', !pattern.test(filenameInput.value) && filenameInput.value !== '');
-  });
+  if (filenameInput) {
+    filenameInput.addEventListener('input', () => {
+      const pattern = /^[a-z0-9_]+$/;
+      filenameInput.classList.toggle('is-invalid', !pattern.test(filenameInput.value) && filenameInput.value !== '');
+    });
+  }
 
   // Thumbnail preview
-  thumbnailInput.addEventListener('change', (e) => {
-    const file = e.target.files[0];
-    thumbnailPreview.style.display = file ? 'block' : 'none';
-    thumbnailPreview.src = file ? URL.createObjectURL(file) : '';
-  });
+  if (thumbnailInput && thumbnailPreview) {
+    thumbnailInput.addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      thumbnailPreview.style.display = file ? 'block' : 'none';
+      thumbnailPreview.src = file ? URL.createObjectURL(file) : '';
+    });
+  }
 
   // Step navigation
   nextButtons.forEach(button => {
@@ -503,6 +519,262 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     });
   });
+
+  // Categories Hierarchy Management
+  const categoryTreeContainer = document.getElementById('categoryTreeContainer');
+  const categoryActionForm = document.getElementById('categoryActionForm');
+  const catIdInput = document.getElementById('cat_id');
+  const catNameInput = document.getElementById('cat_name');
+  const catParentSelect = document.getElementById('cat_parent_id');
+  const catSubmitBtn = document.getElementById('cat_submit_btn');
+  const catCancelBtn = document.getElementById('cat_cancel_btn');
+  const actionFormTitle = document.getElementById('actionFormTitle');
+
+  // Also reference the category dropdown inside the metadata form:
+  const metaCategorySelect = document.getElementById('meta_category_id');
+
+  let allCategories = [];
+
+  async function loadCategories() {
+    try {
+      const response = await fetch('/admin/categories');
+      if (response.ok) {
+        const data = await response.json();
+        allCategories = data.categories;
+        renderCategoryTree();
+        populateCategoryDropdowns();
+      } else {
+        console.error("Failed to load categories");
+      }
+    } catch (err) {
+      console.error("Error loading categories:", err);
+    }
+  }
+
+  // Populate both the parent select (in categories form) and the catalog metadata categories dropdown
+  function populateCategoryDropdowns() {
+    if (!catParentSelect) return;
+    const currentEditId = catIdInput.value ? parseInt(catIdInput.value, 10) : null;
+    
+    // Determine which IDs to exclude (current category and all its descendants to avoid circular inheritance)
+    const excludedIds = new Set();
+    if (currentEditId) {
+      excludedIds.add(currentEditId);
+      let newAdditions = true;
+      while (newAdditions) {
+        newAdditions = false;
+        allCategories.forEach(cat => {
+          if (cat.parent_id && excludedIds.has(cat.parent_id) && !excludedIds.has(cat.id)) {
+            excludedIds.add(cat.id);
+            newAdditions = true;
+          }
+        });
+      }
+    }
+
+    let parentOptionsHtml = '<option value="">None (Top-Level Category)</option>';
+    
+    const sortedCats = getHierarchicalList();
+    sortedCats.forEach(item => {
+      if (!excludedIds.has(item.id)) {
+        const indent = '&nbsp;&nbsp;'.repeat(item.depth);
+        parentOptionsHtml += `<option value="${item.id}">${indent}${item.name}</option>`;
+      }
+    });
+    catParentSelect.innerHTML = parentOptionsHtml;
+
+    // 2. Metadata form hierarchical category select
+    if (metaCategorySelect) {
+      let metaOptionsHtml = '<option value="">Select Category (None)</option>';
+      sortedCats.forEach(item => {
+        const indent = '&nbsp;&nbsp;'.repeat(item.depth);
+        metaOptionsHtml += `<option value="${item.id}">${indent}${item.name}</option>`;
+      });
+      metaCategorySelect.innerHTML = metaOptionsHtml;
+    }
+  }
+
+  // Generates flat list sorted by tree hierarchy with depth metadata
+  function getHierarchicalList() {
+    const list = [];
+    
+    function traverse(parentId, depth) {
+      const children = allCategories.filter(c => c.parent_id === parentId);
+      children.sort((a, b) => a.name.localeCompare(b.name));
+      children.forEach(child => {
+        list.push({ ...child, depth });
+        traverse(child.id, depth + 1);
+      });
+    }
+
+    const roots = allCategories.filter(c => !c.parent_id);
+    roots.sort((a, b) => a.name.localeCompare(b.name));
+    roots.forEach(root => {
+      list.push({ ...root, depth: 0 });
+      traverse(root.id, 1);
+    });
+
+    return list;
+  }
+
+  // Render categories tree structure recursively
+  function renderCategoryTree() {
+    if (!categoryTreeContainer) return;
+    if (allCategories.length === 0) {
+      categoryTreeContainer.innerHTML = '<div class="text-muted p-2">No categories found. Create one on the right.</div>';
+      return;
+    }
+
+    function buildTreeHtml(parentId) {
+      const children = allCategories.filter(c => c.parent_id === parentId);
+      if (children.length === 0) return '';
+
+      children.sort((a, b) => a.name.localeCompare(b.name));
+      
+      let html = '<ul class="list-unstyled ps-3 mt-1">';
+      children.forEach(cat => {
+        html += `
+          <li class="py-1 border-bottom-dashed">
+            <div class="d-flex align-items-center justify-content-between gap-2">
+              <span>
+                <i class="bi bi-folder-fill text-warning me-1"></i>
+                <strong>${cat.name}</strong> 
+              </span>
+              <div class="btn-group btn-group-sm">
+                <button type="button" class="btn btn-outline-primary btn-xs py-0 px-1 border-0 btn-edit-category" data-id="${cat.id}" title="Edit">
+                  <i class="bi bi-pencil-square"></i>
+                </button>
+                <button type="button" class="btn btn-outline-danger btn-xs py-0 px-1 border-0 btn-delete-category" data-id="${cat.id}" title="Delete">
+                  <i class="bi bi-trash"></i>
+                </button>
+              </div>
+            </div>
+            ${buildTreeHtml(cat.id)}
+          </li>
+        `;
+      });
+      html += '</ul>';
+      return html;
+    }
+
+    categoryTreeContainer.innerHTML = buildTreeHtml(null) || '<div class="text-muted p-2">No categories found. Create one on the right.</div>';
+  }
+
+  function editCategory(id) {
+    const cat = allCategories.find(c => c.id === id);
+    if (!cat) return;
+
+    catIdInput.value = cat.id;
+    catNameInput.value = cat.name;
+    
+    populateCategoryDropdowns();
+    catParentSelect.value = cat.parent_id || "";
+
+    actionFormTitle.textContent = "Edit Category";
+    catSubmitBtn.textContent = "Save Changes";
+    catCancelBtn.classList.remove('d-none');
+  }
+
+  function deleteCategory(id) {
+    Swal.fire({
+      title: 'Are you sure?',
+      text: "This will delete the category. Any subcategories and catalog items will have their category set to None.",
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#d33',
+      cancelButtonColor: '#3085d6',
+      confirmButtonText: 'Yes, delete it!'
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        try {
+          const response = await fetch(`/admin/categories/${id}`, {
+            method: 'DELETE'
+          });
+          if (response.ok) {
+            Swal.fire('Deleted!', 'Category has been deleted.', 'success');
+            loadCategories();
+            resetCategoryForm();
+          } else {
+            const data = await response.json();
+            Swal.fire('Error', data.error || 'Failed to delete category', 'error');
+          }
+        } catch (err) {
+          Swal.fire('Error', 'Network error occurred', 'error');
+        }
+      }
+    });
+  }
+
+  if (categoryTreeContainer) {
+    categoryTreeContainer.addEventListener('click', (e) => {
+      const editBtn = e.target.closest('.btn-edit-category');
+      const deleteBtn = e.target.closest('.btn-delete-category');
+      if (editBtn) {
+        const id = parseInt(editBtn.getAttribute('data-id'), 10);
+        editCategory(id);
+      } else if (deleteBtn) {
+        const id = parseInt(deleteBtn.getAttribute('data-id'), 10);
+        deleteCategory(id);
+      }
+    });
+  }
+
+  function resetCategoryForm() {
+    if (!catIdInput) return;
+    catIdInput.value = "";
+    catNameInput.value = "";
+    catParentSelect.value = "";
+    actionFormTitle.textContent = "Create New Category";
+    catSubmitBtn.textContent = "Create Category";
+    catCancelBtn.classList.add('d-none');
+    populateCategoryDropdowns();
+  }
+
+  if (catCancelBtn) {
+    catCancelBtn.addEventListener('click', resetCategoryForm);
+  }
+
+  if (categoryActionForm) {
+    categoryActionForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const id = catIdInput.value;
+      const name = catNameInput.value.trim();
+      const parent_id = catParentSelect.value || null;
+
+      const url = id ? `/admin/categories/${id}` : '/admin/categories';
+      const method = id ? 'PUT' : 'POST';
+
+      try {
+        const response = await fetch(url, {
+          method: method,
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ name, parent_id })
+        });
+
+        const data = await response.json();
+        if (response.ok) {
+          Swal.fire({
+            title: id ? 'Updated!' : 'Created!',
+            text: id ? 'Category updated successfully.' : 'New category created successfully.',
+            icon: 'success',
+            timer: 1500,
+            showConfirmButton: false
+          });
+          loadCategories();
+          resetCategoryForm();
+        } else {
+          Swal.fire('Error', data.error || 'Failed to save category', 'error');
+        }
+      } catch (err) {
+        Swal.fire('Error', 'Network error occurred', 'error');
+      }
+    });
+  }
+
+  // Load categories initially
+  loadCategories();
 });
 
 
@@ -531,8 +803,9 @@ function renderCards(page) {
 
 // Function to render pagination
 function renderPagination() {
-  const totalPages = Math.ceil(cardData.length / cardsPerPage);
   const pagination = document.getElementById('pagination');
+  if (!pagination) return;
+  const totalPages = Math.ceil(cardData.length / cardsPerPage);
   pagination.innerHTML = '';
 
   // Previous button
@@ -578,7 +851,9 @@ function changePage(page) {
 }
 
 // Initial render
-renderCards(currentPage);
-renderPagination();
+if (document.getElementById('pagination')) {
+  renderCards(currentPage);
+  renderPagination();
+}
 // ****************admin uplod toggle uplod form hendle ends********************
 

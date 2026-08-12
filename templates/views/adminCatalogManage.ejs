@@ -86,6 +86,7 @@
                       <% } %>
                     </a>
                   </th>
+                  <th scope="col">Category Path</th>
                   <th scope="col">
                     <a href="#" class="sort-link" data-field="visibility">visibility
                       <% if (sortField === 'visibility') { %>
@@ -114,6 +115,7 @@
                   <td><%= item.file_type %></td>
 
                   <td><%= item.theme %></td>
+                  <td><%= item.category_path || 'None' %></td>
                   <td>
                     <div class="form-check form-switch fs-3">
                       <% if (item.visibility === true) { %>

@@ -132,6 +132,11 @@
                     <td><button class="copy-btn" data-copy-text="<%= item.theme %>">Copy</button></td>
                 </tr>
                 <tr>
+                    <th>Category Hierarchy Path</th>
+                    <td><span class="metadata-value"><%= item.category_path || 'None' %></span></td>
+                    <td><button class="copy-btn" data-copy-text="<%= item.category_path || 'None' %>">Copy</button></td>
+                </tr>
+                <tr>
                     <th>Citation</th>
                     <td><span class="metadata-value"><%= item.citation %></span></td>
                     <td><button class="copy-btn" data-copy-text="<%= item.citation %>">Copy</button></td>

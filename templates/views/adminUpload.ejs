@@ -36,8 +36,8 @@
 
       <div class="row g-3 align-items-end mb-3">
 
-        <div class="col-lg-4 col-md-6 d-flex align-items-center">
-          <label class="form-label d-block me-2">Status</label>
+        <div class="col-lg-6 col-md-8 d-flex align-items-center mb-3">
+          <label class="form-label d-block me-2 mb-0">Status</label>
           <div class="btn-group" role="group" aria-label="Upload selection">
             <input type="radio" class="btn-check" name="formOption" id="vectorOption" value="vector" checked>
             <label class="btn btn-outline-secondary" for="vectorOption">Vector Upload</label>
@@ -47,8 +47,10 @@
 
             <input type="radio" class="btn-check" name="formOption" id="metadataOption" value="metadata">
             <label class="btn btn-outline-secondary" for="metadataOption">Append Meta Data</label>
-          </div>
 
+            <input type="radio" class="btn-check" name="formOption" id="categoriesOption" value="categories">
+            <label class="btn btn-outline-secondary" for="categoriesOption">Manage Categories</label>
+          </div>
         </div>
 
         <!-- Upload Form -->
@@ -206,6 +208,15 @@
             </div>
 
             <div class="row">
+              <div class="col-md-12 mb-3">
+                <label for="meta_category_id" class="form-label">Hierarchical Category</label>
+                <select class="form-select" id="meta_category_id" name="meta_category_id">
+                  <option value="">Select Category (None)</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="row">
               <div class="col-md-6 mb-3">
                 <label for="citation" class="form-label">Citation</label>
                 <input type="text" class="form-control" id="citation" name="citation">
@@ -298,11 +309,51 @@
             </div>
           </div>
         </form>
+
+        <!-- Categories Management Form -->
+        <div id="categoriesForm" class="form-hidden themed-box p-4 rounded">
+          <h4 class="mb-3">Manage Categories Hierarchy</h4>
+          <hr />
+          <div class="row">
+            <!-- Left Side: Category Tree -->
+            <div class="col-md-6 mb-3">
+              <h5 class="mb-3">Category Hierarchy</h5>
+              <div id="categoryTreeContainer" class="p-3 rounded" style="background-color: #0f1116; border: 1px solid #2e3548; max-height: 450px; overflow-y: auto;">
+                Loading categories...
+              </div>
+            </div>
+            
+            <!-- Right Side: Category Actions Form -->
+            <div class="col-md-6 mb-3">
+              <h5 id="actionFormTitle">Create New Category</h5>
+              <form id="categoryActionForm">
+                <input type="hidden" id="cat_id" value="">
+                
+                <div class="mb-3">
+                  <label for="cat_name" class="form-label">Category Name</label>
+                  <input type="text" class="form-control" id="cat_name" placeholder="e.g., Sub-theme Name" required>
+                </div>
+                
+                <div class="mb-3">
+                  <label for="cat_parent_id" class="form-label">Parent Category</label>
+                  <select class="form-select" id="cat_parent_id">
+                    <option value="">None (Top-Level Category)</option>
+                  </select>
+                </div>
+                
+                <div class="d-flex gap-2">
+                  <button type="submit" class="btn btn-success" id="cat_submit_btn">Create Category</button>
+                  <button type="button" class="btn btn-secondary d-none" id="cat_cancel_btn">Cancel Edit</button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
     </main>
   </div>
 
-  <script src="/admin-assets/js/handlesubmits.js"></script>
-  <script src="/admin-assets/js/adminUpload.js"></script>
+  <script src="/admin-assets/js/handlesubmits.js?v=<%= Date.now() %>"></script>
+  <script src="/admin-assets/js/adminUpload.js?v=<%= Date.now() %>"></script>
   <script src="https://unpkg.com/tus-js-client/dist/tus.js"></script>
 
   <%- include('../partials/footer') %>

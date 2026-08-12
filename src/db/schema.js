@@ -15,6 +15,13 @@ async function createTables() {
         admin_role VARCHAR(7) NOT NULL DEFAULT 'admin'
       );
 
+      CREATE TABLE IF NOT EXISTS categories (
+        id SERIAL PRIMARY KEY,
+        name VARCHAR(100) NOT NULL,
+        parent_id INTEGER REFERENCES categories(id) ON DELETE SET NULL,
+        type VARCHAR(50) NOT NULL DEFAULT 'theme'
+      );
+
       CREATE TABLE IF NOT EXISTS catalog (
         sn SERIAL PRIMARY KEY,
         file_name VARCHAR(100) UNIQUE NOT NULL,
@@ -38,9 +45,11 @@ async function createTables() {
         visibility BOOLEAN NOT NULL,
         is_published BOOLEAN NOT NULL,
         edit_mode BOOLEAN  NOT NULL DEFAULT true,
-        year_category TEXT
+        year_category TEXT,
+        category_id INTEGER REFERENCES categories(id) ON DELETE SET NULL
       ); 
 
+      ALTER TABLE catalog ADD COLUMN IF NOT EXISTS category_id INTEGER REFERENCES categories(id) ON DELETE SET NULL;
 
       CREATE TABLE IF NOT EXISTS emailotp (
         sn SERIAL PRIMARY KEY,

@@ -60,7 +60,21 @@ router.get("/metadata/:id", async (req, res) => {
   try {
     const client = await poolUser.connect();
     const result = await client.query(
-      `SELECT * FROM catalog where file_name = $1`,
+      `
+      WITH RECURSIVE category_path AS (
+        SELECT id, name, parent_id, CAST(name AS VARCHAR(1000)) AS path
+        FROM categories
+        WHERE parent_id IS NULL
+        UNION ALL
+        SELECT c.id, c.name, c.parent_id, CAST(cp.path || ' > ' || c.name AS VARCHAR(1000))
+        FROM categories c
+        INNER JOIN category_path cp ON c.parent_id = cp.id
+      )
+      SELECT c.*, cp.path AS category_path
+      FROM catalog c
+      LEFT JOIN category_path cp ON c.category_id = cp.id
+      WHERE c.file_name = $1
+      `,
       [id]
     );
     const catalogItems = result.rows;
