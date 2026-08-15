@@ -103,6 +103,14 @@
                     </a>
                   </th>
 
+                  <th scope="col">
+                    <a href="#" class="sort-link" data-field="auto_display">auto_display
+                      <% if (sortField === 'auto_display') { %>
+                      <%= sortOrder === 'ASC' ? '↑' : '↓' %>
+                      <% } %>
+                    </a>
+                  </th>
+
                   <th scope="col">Delete</th>
                 </tr>
               </thead>
@@ -133,7 +141,15 @@
                       <input class="form-check-input btn-edit" type="checkbox" data-id="<%= item.sn %>">
                       <% } %>
                     </div>
-
+                  </td>
+                  <td>
+                    <div class="form-check form-switch fs-3">
+                      <% if (item.auto_display === true) { %>
+                      <input class="form-check-input btn-auto-display" type="checkbox" role="switch" data-id="<%= item.sn %>" checked>
+                      <% } else { %>
+                      <input class="form-check-input btn-auto-display" type="checkbox" role="switch" data-id="<%= item.sn %>">
+                      <% } %>
+                    </div>
                   </td>
                   <td>
                     <input type="button" class="btn btn-primary btn-delete" value="delete" file-name="<%= item.file_name %>" file-type="<%= item.file_type %>" file-store="<%= item.theme %>", file-theme="<%= item.theme %>">

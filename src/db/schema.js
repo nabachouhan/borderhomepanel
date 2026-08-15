@@ -45,7 +45,8 @@ async function createTables() {
         visibility BOOLEAN NOT NULL,
         is_published BOOLEAN NOT NULL,
         edit_mode BOOLEAN  NOT NULL DEFAULT true,
-        year_category TEXT,
+        display_date TEXT,
+        auto_display BOOLEAN NOT NULL DEFAULT false,
         category_id INTEGER REFERENCES categories(id) ON DELETE SET NULL
       ); 
 

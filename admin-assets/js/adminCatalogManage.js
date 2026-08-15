@@ -20,7 +20,7 @@ document.addEventListener("DOMContentLoaded", function () {
   const tbody = document.querySelector("tbody");
   if (!tbody) return;
 
-  // Single change handler for checkboxes (visibility & edit mode)
+  // Single change handler for checkboxes (visibility, edit mode & auto display)
   tbody.addEventListener("change", async function (event) {
     const target = event.target;
     if (!(target instanceof Element)) return;
@@ -32,6 +32,11 @@ document.addEventListener("DOMContentLoaded", function () {
 
     if (target.classList.contains("btn-edit")) {
       await handleEditModeChange(target);
+      return;
+    }
+
+    if (target.classList.contains("btn-auto-display")) {
+      await handleAutoDisplayChange(target);
       return;
     }
   });
@@ -129,6 +134,31 @@ document.addEventListener("DOMContentLoaded", function () {
     } catch (err) {
       console.error(err);
       await Swal.fire("Error!", "There was an error Updating Edit!");
+      button.checked = !isChecked; // revert
+    }
+  }
+
+  // Auto display change handler
+  async function handleAutoDisplayChange(button) {
+    const isChecked = button.checked;
+    const id = button.getAttribute("data-id");
+    const title = isChecked ? "Are you sure?" : "Are you sure to?";
+    const text = isChecked ? "Enable auto display on dashboard load?" : "Disable auto display on dashboard load?";
+    const confirmButtonText = isChecked ? "Yes, Enable!" : "Yes, Disable!";
+
+    const userConfirmed = await confirmDialog({ title, text, confirmButtonText });
+
+    if (!userConfirmed) {
+      button.checked = !isChecked;
+      return;
+    }
+
+    try {
+      const data = await sendJson("/admin/autodisplay", "POST", { id: id, auto_display: isChecked });
+      await handleResponse(data, "Auto Display Updated!", button, !isChecked);
+    } catch (err) {
+      console.error(err);
+      await Swal.fire("Error!", "There was an error Updating Auto Display!");
       button.checked = !isChecked; // revert
     }
   }

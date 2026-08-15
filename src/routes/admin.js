@@ -712,7 +712,7 @@ router.get("/catalog/:file_name", async (req, res) => {
     const group_visibility = result.rows[0].group_visibility;
     const data_abstract = result.rows[0].data_abstract;
     const metadata_date = result.rows[0].metadata_date;
-    const year_category = result.rows[0].year_category;
+    const display_date = result.rows[0].display_date;
     const area_of_interest = result.rows[0].area_of_interest;
 
     const data_quality = result.rows[0].data_quality;
@@ -748,9 +748,11 @@ router.get("/catalog/:file_name", async (req, res) => {
       client.release();
 
       function roundWKT(wkt, decimals = 3) {
+        if (!wkt) return "";
         return wkt
           .split(/([ ,()])/)
           .map(token => {
+            if (!token.trim()) return token;
             const n = Number(token);
             return Number.isFinite(n) ? n.toFixed(decimals) : token;
           })
@@ -778,7 +780,7 @@ router.get("/catalog/:file_name", async (req, res) => {
         group_visibility: group_visibility,
         data_abstract: data_abstract,
         metadata_date: metadata_date,
-        year_category: year_category,
+        display_date: display_date,
         area_of_interest: area_of_interest,
         data_quality: data_quality,
         projection: projection,
@@ -814,7 +816,7 @@ router.post("/metadata", adminAuthMiddleware, upload.none(), async (req, res) =>
     public_access_level,
     citation,
     source_date,
-    year_category,
+    display_date,
     group_visibility,
     data_abstract,
     area_of_interest,
@@ -846,7 +848,7 @@ router.post("/metadata", adminAuthMiddleware, upload.none(), async (req, res) =>
           data_abstract = $8,
           area_of_interest = $9,
           metadata_date = $10,
-          year_category = $11,
+          display_date = $11,
           data_quality = $12,
           language = $13,
           projection = $14,
@@ -866,7 +868,7 @@ router.post("/metadata", adminAuthMiddleware, upload.none(), async (req, res) =>
         data_abstract,
         area_of_interest,
         metadata_date,
-        year_category,
+        display_date,
         data_quality,
         language,
         projection,
@@ -1509,6 +1511,7 @@ router.get("/manage", adminAuthMiddleware, async (req, res) => {
       "theme",
       "visibility",
       "edit_mode",
+      "auto_display",
     ];
     const safeSortField = validSortFields.includes(sortField)
       ? sortField
@@ -1526,7 +1529,7 @@ router.get("/manage", adminAuthMiddleware, async (req, res) => {
         FROM categories c
         INNER JOIN category_path cp ON c.parent_id = cp.id
       )
-      SELECT c.sn, c.file_name, c.file_type, c.title, c.theme, c.visibility, c.edit_mode, cp.path AS category_path 
+      SELECT c.sn, c.file_name, c.file_type, c.title, c.theme, c.visibility, c.edit_mode, c.auto_display, cp.path AS category_path 
       FROM catalog c
       LEFT JOIN category_path cp ON c.category_id = cp.id
     `;
@@ -1630,6 +1633,34 @@ router.post("/editmode", adminAuthMiddleware, async (req, res) => {
     res
       .status(201)
       .json({ success: true, icon: "success", message: "Edit Mode Updated" });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Server Error" });
+  }
+});
+
+// ✅ Route: POST /autodisplay Toggle auto_display of layers on repository (Dashboard, protected by adminAuth)
+router.post("/autodisplay", adminAuthMiddleware, async (req, res) => {
+  const { id, auto_display } = req.body;
+
+  if (id == null || auto_display == null) {
+    return res.status(400).json({ error: "Invalid request" });
+  }
+
+  try {
+    const client = await poolUser.connect();
+    const query = `
+            UPDATE catalog
+            SET auto_display = $1
+            WHERE sn = $2
+        `;
+    const values = [auto_display, id];
+
+    await client.query(query, values);
+    client.release();
+    res
+      .status(201)
+      .json({ success: true, icon: "success", message: "Auto Display Updated" });
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "Server Error" });
