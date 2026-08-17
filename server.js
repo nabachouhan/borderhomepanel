@@ -63,7 +63,7 @@ function restoreTusContentType(req, _res, next) {
 function handleTus(req, res) {
   // 🔍 DIAGNOSTIC: log every TUS request+response so we can see
   //    if 403 comes from Express/TUS (log appears) or from WAF (no log)
-  res.on('finish', async () => {
+  res.on('finish', () => {
     console.log(
       `[TUS] ${req.method} ${req.path}` +
       ` | status=${res.statusCode}` +
@@ -73,18 +73,6 @@ function handleTus(req, res) {
     );
     if (res.statusCode === 400) {
       console.log(`[TUS 400 Debug] Request Headers:`, req.headers);
-      const ctVal = req.headers['content-type'];
-      console.log(`[TUS 400 Debug] content-type value: "${ctVal}" (length: ${ctVal?.length})`);
-      if (ctVal) {
-        console.log(`[TUS 400 Debug] content-type char codes:`, [...ctVal].map(c => c.charCodeAt(0)));
-      }
-      try {
-        const { NodeRequest } = await import("srvx");
-        const srvxReq = new NodeRequest({ req, res });
-        console.log(`[TUS 400 Debug] srvx headers entries:`, [...srvxReq.headers.entries()]);
-      } catch (err) {
-        console.log(`[TUS 400 Debug] srvx inspect failed:`, err.message);
-      }
     }
   });
   tusServer.handle(req, res);
