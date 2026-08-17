@@ -40,12 +40,33 @@ app.use(cookieParser());
 //   1. Client sent application/octet-stream  → our WAF bypass transform
 //   2. X-HTTP-Method-Override: PATCH present OR POST request with upload-offset → this IS a TUS chunk, force it
 function restoreTusContentType(req, _res, next) {
-  const ct = (req.headers['content-type'] || '').toLowerCase();
-  const methodOverride = (req.headers['x-http-method-override'] || '').toUpperCase();
-  
+  // Helper to robustly read header values, resolving potential comma-separated duplicates
+  const getHeader = (name) => {
+    const val = req.headers[name.toLowerCase()];
+    if (Array.isArray(val)) return val[0];
+    if (typeof val === 'string' && val.includes(',')) return val.split(',')[0].trim();
+    return val;
+  };
+
+  const ct = (getHeader('content-type') || '').toLowerCase();
+  const methodOverride = (getHeader('x-http-method-override') || '').toUpperCase();
+  const tusResumable = getHeader('tus-resumable');
+  const uploadOffset = getHeader('upload-offset');
+
+  // Rewrite normalized values back to req.headers to resolve duplicate/malformed values (e.g. "1.0.0, 1.0.0" or "0, 0")
+  if (tusResumable) {
+    req.headers['tus-resumable'] = tusResumable;
+  }
+  if (uploadOffset !== undefined) {
+    req.headers['upload-offset'] = uploadOffset;
+  }
+  if (methodOverride) {
+    req.headers['x-http-method-override'] = methodOverride;
+  }
+
   // A request is a TUS chunk if it's explicitly overridden as PATCH,
   // OR if it's a POST request that contains the upload-offset header.
-  const isTusChunk = methodOverride === 'PATCH' || (req.method === 'POST' && req.headers['upload-offset'] !== undefined);
+  const isTusChunk = methodOverride === 'PATCH' || (req.method === 'POST' && uploadOffset !== undefined);
   const isWafDisguised = ct.startsWith('application/octet-stream');
 
   // Actually apply the METHOD OVERRIDE for @tus/server
