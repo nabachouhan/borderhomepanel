@@ -71,6 +71,9 @@ function handleTus(req, res) {
       ` | ct=${req.headers['content-type'] || '-'}` +
       ` | cookie=${req.cookies?.token ? 'present' : 'MISSING'}`
     );
+    if (res.statusCode === 400) {
+      console.log(`[TUS 400 Debug] Request Headers:`, req.headers);
+    }
   });
   tusServer.handle(req, res);
 }
