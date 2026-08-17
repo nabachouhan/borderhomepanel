@@ -38,11 +38,14 @@ app.use(cookieParser());
 // "application/octet-stream" for WAF compatibility.
 // Two triggers to handle all cases:
 //   1. Client sent application/octet-stream  → our WAF bypass transform
-//   2. X-HTTP-Method-Override: PATCH present → this IS a TUS chunk, force it
+//   2. X-HTTP-Method-Override: PATCH present OR POST request with upload-offset → this IS a TUS chunk, force it
 function restoreTusContentType(req, _res, next) {
   const ct = (req.headers['content-type'] || '').toLowerCase();
   const methodOverride = (req.headers['x-http-method-override'] || '').toUpperCase();
-  const isTusChunk = methodOverride === 'PATCH';
+  
+  // A request is a TUS chunk if it's explicitly overridden as PATCH,
+  // OR if it's a POST request that contains the upload-offset header.
+  const isTusChunk = methodOverride === 'PATCH' || (req.method === 'POST' && req.headers['upload-offset'] !== undefined);
   const isWafDisguised = ct.startsWith('application/octet-stream');
 
   // Actually apply the METHOD OVERRIDE for @tus/server
