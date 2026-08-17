@@ -338,6 +338,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
         return {
           getUnderlyingObject: () => xhr,
+          getMethod: () => method,
+          getURL: () => url,
+          getHeader(key) {
+            const lowerKey = key.toLowerCase();
+            const foundKey = Object.keys(pendingHeaders).find(k => k.toLowerCase() === lowerKey);
+            return foundKey ? pendingHeaders[foundKey] : undefined;
+          },
 
           // no-op: real open() happens inside send() to guarantee order:
           //   open → setRequestHeader → send
@@ -380,6 +387,7 @@ document.addEventListener('DOMContentLoaded', () => {
                   getStatus: () => xhr.status,
                   getHeader: (name) => xhr.getResponseHeader(name),
                   getBody: () => xhr.responseText,
+                  getUnderlyingObject: () => xhr,
                 });
               xhr.onerror = () => reject(new Error("TUS network request failed"));
               xhr.send(body);
