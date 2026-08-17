@@ -73,6 +73,11 @@ function handleTus(req, res) {
     );
     if (res.statusCode === 400) {
       console.log(`[TUS 400 Debug] Request Headers:`, req.headers);
+      const ctVal = req.headers['content-type'];
+      console.log(`[TUS 400 Debug] content-type value: "${ctVal}" (length: ${ctVal?.length})`);
+      if (ctVal) {
+        console.log(`[TUS 400 Debug] content-type char codes:`, [...ctVal].map(c => c.charCodeAt(0)));
+      }
     }
   });
   tusServer.handle(req, res);
